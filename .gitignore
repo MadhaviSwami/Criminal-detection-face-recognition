@@ -1,0 +1,23 @@
+# Secrets - never commit
+.env
+
+# Personal data: database export with names and face embeddings
+database/*.sql
+database/*.db
+
+# User images (faces, uploads, scan snapshots) - recreated automatically by app.py
+static/uploads/
+static/results/
+static/identity_photos/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

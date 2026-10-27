@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Based Face Recognition and Investigation System — Educational Computer Vision Project">
+    <title>FaceVault AI | Face Recognition System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- ═══ Ambient Background ═══ -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- ═══ Navigation ═══ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand" onclick="switchTab('dashboard')">
+                <div class="brand-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                        <circle cx="9" cy="10" r="1.5"/><circle cx="15" cy="10" r="1.5"/>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                    </svg>
+                </div>
+                <span class="brand-text">FaceVault<span class="brand-accent">AI</span></span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#" class="nav-link active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-tab="recognize" onclick="switchTab('recognize')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                    Recognize</a></li>
+                <li><a href="#" class="nav-link" data-tab="live" onclick="switchTab('live')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                    Live Scan</a></li>
+                <li><a href="#" class="nav-link" data-tab="identities" onclick="switchTab('identities')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    Identities</a></li>
+                <li><a href="#" class="nav-link" data-tab="logs" onclick="switchTab('logs')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Logs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-content">
+
+        <!-- ─── DASHBOARD TAB ──────────────────────────────── -->
+        <section id="tab-dashboard" class="tab-content active">
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">Investigation Dashboard</h1>
+                <p class="page-subtitle">Real-time overview of the AI face recognition system. Monitor identities, scans, and matches.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card purple fade-in-up stagger-1">
+                    <div class="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                    <div class="stat-value" id="statIdentities">0</div>
+                    <div class="stat-label">Total Identities</div>
+                </div>
+                <div class="stat-card green fade-in-up stagger-2">
+                    <div class="stat-icon" style="background:rgba(0,210,160,0.1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5"/><circle cx="15" cy="10" r="1.5"/></svg></div>
+                    <div class="stat-value" id="statEmbeddings">0</div>
+                    <div class="stat-label">Face Embeddings</div>
+                </div>
+                <div class="stat-card blue fade-in-up stagger-3">
+                    <div class="stat-icon" style="background:rgba(66,165,245,0.1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div>
+                    <div class="stat-value" id="statScans">0</div>
+                    <div class="stat-label">Total Scans</div>
+                </div>
+                <div class="stat-card orange fade-in-up stagger-4">
+                    <div class="stat-icon" style="background:rgba(255,167,38,0.1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                    <div class="stat-value" id="statMatches">0</div>
+                    <div class="stat-label">Matches Found</div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;margin-bottom:var(--space-2xl)">
+                <button class="btn btn-primary btn-lg" onclick="switchTab('recognize')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                    Run Face Recognition
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="switchTab('identities')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Manage Identities
+                </button>
+                <button class="btn btn-danger btn-lg" onclick="deleteAllData()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                    Delete All Data
+                </button>
+            </div>
+
+            <div class="card fade-in-up">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Activity</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="switchTab('logs')">View All</button>
+                </div>
+                <div id="dashboardLogs">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                        <h3>No Activity Yet</h3>
+                        <p>Add identities and run recognition scans to see activity here.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── RECOGNIZE TAB ──────────────────────────────── -->
+        <section id="tab-recognize" class="tab-content">
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">Face Recognition Scanner</h1>
+                <p class="page-subtitle">Upload an image to detect faces and compare them against the identity database.</p>
+            </div>
+
+            <div class="card fade-in-up" style="margin-bottom:var(--space-2xl)">
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="imageInput" accept="image/*" style="display:none">
+                    <div class="upload-icon" id="uploadIcon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="upload-text" id="uploadText">Drop an image here or click to browse</p>
+                    <p class="upload-subtext">Supports: PNG, JPG, JPEG, WEBP, BMP &bull; Max 16 MB</p>
+                    <img class="upload-preview" id="uploadPreview" style="display:none" alt="Preview">
+                </div>
+                <div style="text-align:center;margin-top:var(--space-xl)">
+                    <button class="btn btn-primary btn-lg" id="analyzeBtn" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                        Analyze Faces
+                    </button>
+                </div>
+            </div>
+            <div id="resultsContainer"></div>
+        </section>
+
+        <!-- ─── LIVE SCAN TAB ──────────────────────────────── -->
+        <section id="tab-live" class="tab-content">
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">Live Face Scan</h1>
+                <p class="page-subtitle">Use your webcam to detect and identify faces in real time against the identity database.</p>
+            </div>
+
+            <div class="live-layout">
+                <div class="card live-video-card">
+                    <div class="live-stage" id="liveStage">
+                        <video id="liveVideo" autoplay playsinline muted></video>
+                        <canvas id="liveOverlay"></canvas>
+                        <div class="live-placeholder" id="livePlaceholder">
+                            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                            <h3>Camera is off</h3>
+                            <p>Press <strong>Start Camera</strong> and allow camera access when your browser asks.</p>
+                        </div>
+                        <span class="live-badge" id="liveBadge" style="display:none">● LIVE</span>
+                    </div>
+                    <div class="live-controls">
+                        <button class="btn btn-primary" id="liveStartBtn" onclick="resetBestMatch(); startLiveScan()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Start Camera
+                        </button>
+                        <button class="btn btn-danger" id="liveStopBtn" onclick="stopLiveScan()" disabled>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+                            Stop
+                        </button>
+                        <select class="form-select live-camera-select" id="liveCameraSelect" style="display:none" aria-label="Choose camera"></select>
+                        <span class="live-status" id="liveStatus">Idle</span>
+                    </div>
+                </div>
+
+                <div class="live-side">
+                    <div class="card live-panel live-best-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Best Match</h2>
+                            <span class="results-badge badge-matches" id="bestMatchBadge" style="display:none">MAX</span>
+                        </div>
+                        <div id="bestMatchEmpty" class="empty-state live-empty">
+                            <p>The snapshot with the highest match % will appear here automatically while scanning.</p>
+                        </div>
+                        <div id="bestMatchResult" style="display:none">
+                            <img id="bestMatchImg" class="best-match-img" alt="Best match snapshot">
+                            <div class="best-match-info">
+                                <div class="best-match-text">
+                                    <div class="best-match-name" id="bestMatchName"></div>
+                                    <div class="live-person-alias" id="bestMatchAlias"></div>
+                                    <div class="best-match-time" id="bestMatchTime"></div>
+                                </div>
+                                <div class="best-match-pct" id="bestMatchPct"></div>
+                            </div>
+                            <div class="best-match-actions">
+                                <button class="btn btn-success btn-sm" onclick="downloadBestMatch()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Download
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="resetBestMatch()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card live-panel">
+                        <div class="card-header">
+                            <h2 class="card-title">In View</h2>
+                            <span class="results-badge badge-faces" id="liveFaceCount">0 faces</span>
+                        </div>
+                        <div id="livePeople">
+                            <div class="empty-state live-empty">
+                                <p>Recognized people will appear here while the camera is running.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── IDENTITIES TAB ─────────────────────────────── -->
+        <section id="tab-identities" class="tab-content">
+            <div class="page-header fade-in-up">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md)">
+                    <div>
+                        <h1 class="page-title">Identity Database</h1>
+                        <p class="page-subtitle">Manage fictional identities for face recognition matching.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Identity
+                    </button>
+                </div>
+            </div>
+            <div id="identitiesGrid" class="identities-grid"></div>
+            <div id="identitiesEmpty" class="card" style="display:none">
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    <h3>No Identities Yet</h3>
+                    <p>Add fictional identities with photos to build the recognition database.</p>
+                    <button class="btn btn-primary" onclick="openAddModal()" style="margin-top:var(--space-lg)">Add Your First Identity</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── LOGS TAB ───────────────────────────────────── -->
+        <section id="tab-logs" class="tab-content">
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">Recognition Logs</h1>
+                <p class="page-subtitle">Complete history of all face recognition scans and their results.</p>
+            </div>
+            <div class="card fade-in-up">
+                <div id="logsTable"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ═══ Add Identity Modal ═══ -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Identity</h2>
+                <button class="modal-close" onclick="closeAddModal()">✕</button>
+            </div>
+            <form id="addIdentityForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label" for="idName">Full Name *</label>
+                    <input type="text" class="form-input" id="idName" name="name" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="idAlias">Alias / Code Name</label>
+                    <input type="text" class="form-input" id="idAlias" name="alias" placeholder="e.g. The Phantom">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="idDesc">Description</label>
+                    <textarea class="form-textarea" id="idDesc" name="description" placeholder="Brief fictional background..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="idPhoto">Photo (for face embedding)</label>
+                    <input type="file" class="form-input" id="idPhoto" name="photo" accept="image/*">
+                    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">Upload a clear face photo to generate embeddings for matching.</p>
+                </div>
+                <div style="display:flex;gap:var(--space-md);justify-content:flex-end">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitIdentityBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        Save Identity
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ Scan Details Modal ═══ -->
+    <div class="modal-overlay" id="scanModal">
+        <div class="modal scan-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="scanModalTitle">Scan Details</h2>
+                <button class="modal-close" onclick="closeScanDetails()">✕</button>
+            </div>
+            <div id="scanModalBody"></div>
+        </div>
+    </div>
+
+    <!-- ═══ Loading Spinner ═══ -->
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner"></div>
+        <p class="spinner-text" id="spinnerText">Processing...</p>
+    </div>
+
+    <!-- ═══ Toast Container ═══ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Hidden file input for adding photos to existing identities -->
+    <input type="file" id="extraPhotoInput" accept="image/*" style="display:none">
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="footer-copy">&copy; 2026 FaceVault AI — Computer Vision Educational Tool</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
